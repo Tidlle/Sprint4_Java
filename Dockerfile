@@ -1,11 +1,12 @@
-# Etapa de build
+# Build (JDK 17 + Maven)
 FROM maven:3.9.6-eclipse-temurin-17 AS build
 WORKDIR /app
 COPY pom.xml .
 COPY src ./src
-RUN mvn -DskipTests package
+# logs mais verbosos ajudam a ver o erro real no Render
+RUN mvn -DskipTests -e -X -Dhttp.keepAlive=false -Dmaven.wagon.http.pool=false package
 
-# Etapa de execução
+# Runtime (JRE 17)
 FROM eclipse-temurin:17-jre
 WORKDIR /app
 COPY --from=build /app/target/quarkus-app /app
